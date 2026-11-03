@@ -105,4 +105,4 @@ On the full GTNH 2.9.0 pack, where Hodgepodge 2.7.221's RCON fix also applies, i
 
 ## License
 
-MIT, see [LICENSE](LICENSE). The build setup comes from GTNH's [ExampleMod1.7.10](https://github.com/GTNewHorizons/ExampleMod1.7.10), also MIT.
+MIT, see [LICENSE](LICENSE). The build setup comes from GTNH's [ExampleMod1.7.10](https://github.com/GTNewHorizons/ExampleMod1.7.10), also MIT ([LICENSE-ExampleMod1.7.10](LICENSE-ExampleMod1.7.10)).
