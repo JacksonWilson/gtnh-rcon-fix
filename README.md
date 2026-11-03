@@ -102,3 +102,7 @@ RCON sends the password and every command in plain text, so it should only cross
 Unit tests cover packet framing, the lockout rules, and real loopback sessions: several commands on one connection, wrong passwords, lockout, the allow list and the login timeout. The Mixins were checked on JourneySync's dev server (Forge 1.7.10, UniMixins): RCON bound to 127.0.0.1, three commands ran on one connection, and the log shows them executing on `Server thread`.
 
 On the full GTNH 2.9.0 pack, where Hodgepodge 2.7.221's RCON fix also applies, it drove a local copy of a real server through JourneySync's multi-player tests: game modes, teleports, whitelist changes, mod commands and `stop`, many commands per connection. On a live Akliz server it listens on 0.0.0.0 behind a one-to-one port forward with an allow list, and runs commands such as `list` and `dynmap fullrender` from a home PC.
+
+## License
+
+MIT, see [LICENSE](LICENSE). The build setup comes from GTNH's [ExampleMod1.7.10](https://github.com/GTNewHorizons/ExampleMod1.7.10), also MIT.
