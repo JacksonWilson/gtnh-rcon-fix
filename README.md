@@ -29,7 +29,7 @@ The wire protocol is unchanged, so any RCON client works. The mod does nothing o
 
 ## Install
 
-1. Put `rconfix-<version>.jar` in the server's `mods` folder. It needs UniMixins, which GTNH already has.
+1. Download `rconfix-<version>.jar` from this repo's Releases and put it in the server's `mods` folder. It needs UniMixins, which GTNH already has.
 2. In `server.properties`, set `enable-rcon=true`, a `rcon.port`, and a long random `rcon.password`.
 3. Start the server. The mod writes `config/rconfix.cfg`; the defaults keep RCON on 127.0.0.1.
 
@@ -49,7 +49,22 @@ tasks.named("runServer", JavaExec).configure { systemProperty("fml.coreMods.load
 python scripts/rcon.py --properties ../JourneySync/run/server/server.properties "list" "tp Alex 2000 100 2000"
 ```
 
-It prints each command and its reply, and exits with code 1 if the login fails.
+It prints each command and its reply, and exits with code 1 if the login fails. For a remote server, `--host <address>` overrides the address in the file, which on a hosted server is usually `0.0.0.0`.
+
+## Hosted servers (Akliz)
+
+On a host, connections reach the server through a port forward, so RCON has to listen on every interface. Lock it down with the allow list and a long password:
+
+1. In Akliz's Command Center, open the server's Port Forwarding page and request an "Other" TCP port with "One to One" ticked, so the public and private port numbers match.
+2. In `server.properties`, set `enable-rcon=true`, `rcon.port` to that number, and `rcon.password` to a long random string of letters and digits (Akliz's panel rejects other characters).
+3. In `config/rconfix.cfg`, set `bindAddress=0.0.0.0` and list your own public IP under `allowedAddresses`. If your IP changes, RCON refuses you until you update the list.
+4. Start the server. The log says `RCON running on 0.0.0.0:<port>`, and each connection logs the client's address.
+
+```bash
+python scripts/rcon.py --properties server.properties --host <server IP> "list"
+```
+
+The password and commands still cross the internet in plain text until the encrypted listener below exists.
 
 ## Config
 
@@ -84,4 +99,6 @@ RCON sends the password and every command in plain text, so it should only cross
 .\dev.ps1 spotlessApply    # GTNH formatting (the build fails without it)
 ```
 
-Unit tests cover packet framing, the lockout rules, and real loopback sessions: several commands on one connection, wrong passwords, lockout, the allow list and the login timeout. The Mixins were checked on JourneySync's dev server (Forge 1.7.10, UniMixins): RCON bound to 127.0.0.1, three commands ran on one connection, and the log shows them executing on `Server thread`. Not yet checked on the full GTNH pack, where Hodgepodge's RCON fix also applies.
+Unit tests cover packet framing, the lockout rules, and real loopback sessions: several commands on one connection, wrong passwords, lockout, the allow list and the login timeout. The Mixins were checked on JourneySync's dev server (Forge 1.7.10, UniMixins): RCON bound to 127.0.0.1, three commands ran on one connection, and the log shows them executing on `Server thread`.
+
+On the full GTNH 2.9.0 pack, where Hodgepodge 2.7.221's RCON fix also applies, it drove a local copy of a real server through JourneySync's multi-player tests: game modes, teleports, whitelist changes, mod commands and `stop`, many commands per connection. On a live Akliz server it listens on 0.0.0.0 behind a one-to-one port forward with an allow list, and runs commands such as `list` and `dynmap fullrender` from a home PC.
