@@ -13,8 +13,13 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
-import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.message.ParameterizedMessageFactory;
+import org.apache.logging.log4j.simple.SimpleLogger;
+import org.apache.logging.log4j.util.PropertiesUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,6 +34,24 @@ import org.junit.jupiter.api.parallel.ExecutionMode;
 class RconSessionTest {
 
     private static final String PASSWORD = "correct horse battery staple";
+
+    /**
+     * Prints to stdout without starting log4j-core. LogManager.getLogger would load FML's log4j2.xml, and log4j
+     * 2.0-beta9 then loads every class in the classpath folders (about 2,700 Minecraft classes) while holding a lock.
+     * On Windows with Defender scanning each class file that takes 5 to 20 s, so the first session would answer after
+     * the client's read timeout, and the sessions after it would wait on the same lock.
+     */
+    private static final Logger LOG = new SimpleLogger(
+        "RconSessionTest",
+        Level.INFO,
+        false,
+        false,
+        true,
+        false,
+        "HH:mm:ss.SSS",
+        ParameterizedMessageFactory.INSTANCE,
+        new PropertiesUtil(new Properties()),
+        System.out);
 
     private ServerSocket listener;
     private List<String> ran;
@@ -60,7 +83,7 @@ class RconSessionTest {
                 ran.add(command);
             }
             return "ran " + command;
-        }, guard, settings, LogManager.getLogger("RconSessionTest")).run());
+        }, guard, settings, LOG).run());
         t.setDaemon(true);
         t.start();
         client.setSoTimeout(5_000);
